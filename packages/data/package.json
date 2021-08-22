@@ -5,6 +5,10 @@
   "typings": "dist/index.d.ts",
   "author": "Jeffrey Quesnelle <jeff@edennetwork.io>",
   "description": "Helper library to retreive data on Eden Network",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/eden-network/eden-data.git"
+  },
   "license": "MIT",
   "files": [
     "dist"
