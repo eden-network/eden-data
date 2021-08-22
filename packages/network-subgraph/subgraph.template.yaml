@@ -1,0 +1,33 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: EdenNetwork
+    network: {{ network }}
+    source:
+      address: '{{ address }}'
+      abi: EdenNetwork
+      startBlock: {{ startBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyScript
+      entities:
+        - Slot
+        - Staker
+        - Network
+        - SlotClaim
+      abis:
+        - name: EdenNetwork
+          file: abis/EdenNetwork.json
+      eventHandlers:
+        - event: SlotClaimed(indexed uint8,indexed address,indexed address,uint128,uint128,uint16,uint16)
+          handler: slotClaimed
+        - event: SlotDelegateUpdated(indexed uint8,indexed address,indexed address,address)
+          handler: slotDelegateUpdated
+        - event: Stake(indexed address,uint256)
+          handler: stake
+        - event: Unstake(indexed address,uint256)
+          handler: unstake
+      file: ./src/mapping.ts

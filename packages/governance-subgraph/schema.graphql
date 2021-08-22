@@ -1,0 +1,164 @@
+type Producer @entity {
+    # Address
+    id: ID!
+
+    # Currently added (true) or removed (false)
+    active: Boolean!
+
+    # Address of collector
+    rewardCollector: Bytes
+
+    # Total rewards, does not include pending rewards
+    rewards: BigInt!
+
+    # Total number of blocks produced by this producer, not including in the pending epoch
+    confirmedBlocks: BigInt!
+
+    # Blocks produced in pending epoch
+    pendingEpochBlocks: BigInt!
+}
+
+type ProducerSet @entity {
+    # Governance address
+    id: ID!
+
+    # All registered (active and inactive) producers
+    producers: [Producer!]!
+}
+
+enum ProducerSetChangeType {
+    Added
+    Removed
+}
+
+type ProducerSetChange @entity {
+    # Transaction 
+    id: ID!
+
+    # Block change occured in (effective next block)
+    blockNumber: BigInt!
+
+    # Producer address
+    producer: Bytes!
+
+    # Set change type
+    changeType: ProducerSetChangeType!
+}
+
+type ProducerRewardCollectorChange @entity {
+    # Transaction
+    id: ID!
+
+    # Block change occured in (effective next block)
+    blockNumber: BigInt!
+
+    # Producer address
+    producer: Bytes!
+
+    # Address of collector
+    rewardCollector: Bytes!
+}
+
+type RewardScheduleEntry @entity {
+    # ID of transaction applying schedule plus index (e.g. 0xfoo+index1)
+    id: ID!
+
+    # Timestamp of reward start
+    startTime: BigInt!
+
+    # Duration of epochs
+    epochDuration: BigInt!
+
+    # Rewards per epoch
+    rewardsPerEpoch: BigInt!
+}
+
+type RewardSchedule @entity {
+    # Governance address
+    id: ID!
+
+    # Current block reward schedule
+    rewardScheduleEntries: [RewardScheduleEntry!]!
+
+    # Last finished epoch
+    lastEpoch: Epoch
+
+    # Current pending epoch
+    pendingEpoch: Epoch
+
+    # Active reward schedule entry
+    activeRewardScheduleEntry: RewardScheduleEntry
+}
+
+type ProducerEpoch @entity {
+    # Producer address + epoch, e.g. 0xf00+epochX
+    id: ID!
+
+    # Producer address
+    address: Bytes!
+
+    # Epoch
+    epoch: Epoch!
+
+    # Total cumulative rewards for producer (replicated to merkle tree)
+    totalRewards: BigInt!
+
+    # Blocks produced by this producer during this epoch
+    blocksProduced: BigInt!
+
+    # Ratio of blocks produced compared to those by all registered producers [0.0, 1.0]
+    blocksProducedRatio: BigDecimal!
+}
+
+type Block @entity {
+    # Block hash
+    id: ID!
+
+    # If produced by an active producer
+    fromActiveProducer: Boolean!
+
+    # Block properties
+    hash: Bytes!
+    parentHash: Bytes!
+    unclesHash: Bytes!
+    author: Bytes!
+    stateRoot: Bytes!
+    transactionsRoot: Bytes!
+    receiptsRoot: Bytes!
+    number: BigInt!
+    gasUsed: BigInt!
+    gasLimit: BigInt!
+    timestamp: BigInt!
+    difficulty: BigInt!
+    totalDifficulty: BigInt!
+    size: BigInt
+}
+
+type Epoch @entity {
+    # Governance address + epoch e.g. 0xf00+epochX
+    id: ID!
+
+    # If epoch has been finished
+    finalized: Boolean!
+
+    # Epoch number
+    epochNumber: BigInt!
+
+    # Start block
+    startBlock: Block
+
+    # End block
+    endBlock: Block
+
+    # Producer blocks
+    producerBlocks: BigInt!
+    
+    # All blocks
+    allBlocks: BigInt!
+
+    # Ratio of producer blocks to all blocks [0.0, 1.0]
+    producerBlocksRatio: BigDecimal!
+
+    # Snapshot of rewards
+    producerRewards: [ProducerEpoch!]! @derivedFrom(field: "epoch")
+}

@@ -1,0 +1,21 @@
+{
+    "name": "@eden-network/data-monorepo",
+    "version": "1.0.0",
+    "description": "Collection and reporting of Eden Network data ",
+    "private": true,
+    "author": "Jeffrey Quesnelle <jeff@edennetwork.io>",
+    "license": "MIT",
+    "engines": {
+        "node": ">=10"
+    },
+    "scripts": {
+        "data:build": "yarn workspace @eden-network/data build",
+        "data:test": "yarn workspace @eden-network/data test"
+    },
+    "homepage": "https://edennetwork.io",
+    "workspaces": {
+        "packages": [
+            "packages/**"
+        ]
+    }
+}

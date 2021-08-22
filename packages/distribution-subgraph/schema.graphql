@@ -1,0 +1,78 @@
+type Distributor @entity {
+    # Address of distributor contract
+    id: ID!
+
+    # The current distribution
+    currentDistribution: Distribution
+}
+
+type Distribution @entity {
+    # Transaction 
+    id: ID!
+
+    # Distributor
+    distributor: Distributor!
+
+    # Timestamp distribution was applied
+    timestamp: BigInt!
+
+    # Distribution number
+    distributionNumber: BigInt!
+
+    # Root of the merkle tree containing total earned rewards
+    merkleRoot: Bytes!
+
+    # Metadata URI
+    metadataURI: String!
+}
+
+type Claim @entity {
+    # Transaction 
+    id: ID!
+
+    # Timestamp claim was made
+    timestamp: BigInt!
+
+    # Index in the merkle tree
+    index: BigInt!
+
+    # Account
+    account: Account!
+
+    # Total amount earned
+    totalEarned: BigInt!
+
+    # Claimed amount by this claim
+    claimed: BigInt!
+}
+
+type Slash @entity {
+    # Transaction 
+    id: ID!
+
+    # Timestamp slash was made
+    timestamp: BigInt!
+
+    # Account
+    account: Account!
+
+    # Slashed amount by this slash
+    slashed: BigInt!
+}
+
+type Account @entity {
+    # Account address
+    id: ID!
+
+    # Total amount claimed
+    totalClaimed: BigInt!
+
+    # Total amount slashed
+    totalSlashed: BigInt!
+
+    # All claims
+    claims: [Claim!]! @derivedFrom(field: "account")
+
+    # All slashes
+    slashes: [Slash!]! @derivedFrom(field: "account")
+}

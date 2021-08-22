@@ -1,0 +1,85 @@
+type SlotClaim @entity {
+    # Transaction
+    id: ID!
+
+    # Slot
+    slot: Slot!
+
+    # Owner address
+    owner: Bytes!
+
+    # Winning bid
+    winningBid: BigInt!
+
+    # Old bid
+    oldBid: BigInt!
+
+    # Timestamp of when slot ownership started
+    startTime: BigInt!
+
+    # Timestamp of when slot ownership expires
+    expirationTime: BigInt!
+
+    # Tax rate per day
+    taxRatePerDay: BigDecimal!
+}
+
+type Slot @entity {
+    # Address of network contract + slot index, e.g. "0xF00-0"
+    id: ID!
+
+    # Owner address
+    owner: Bytes!
+
+    # Delegate address
+    delegate: Bytes!
+
+    # Winning bid
+    winningBid: BigInt!
+
+    # Old bid
+    oldBid: BigInt!
+
+    # Timestamp of when slot ownership started
+    startTime: BigInt!
+
+    # Timestamp of when slot ownership expires
+    expirationTime: BigInt!
+
+    # Tax rate per day
+    taxRatePerDay: BigDecimal!
+
+    # Slot claims
+    claims: [SlotClaim]! @derivedFrom(field: "slot")
+}
+
+type Staker @entity {
+    # Address of staker
+    id: ID!
+
+    # Amount staked
+    staked: BigInt!
+
+    # Zero-based (zero being highest) rank of non-zero stakers, or null for a zero stake
+    rank: BigInt
+}
+
+type Network @entity {
+    # Address of contract 
+    id: ID!
+
+    slot0: Slot
+    slot1: Slot
+    slot2: Slot
+
+    stakers: [Staker!]!
+
+    # Number of non-zero stakers
+    numStakers: BigInt
+
+    # Total amount staked
+    totalStaked: BigInt!
+
+    # Percentiles (0-99) of staker amounts
+    stakedPercentiles: [BigInt!]!
+}
