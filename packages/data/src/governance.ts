@@ -71,7 +71,7 @@ export async function producerRewardCollectorChanges({startBlock, endBlock, netw
         .then(results => results.sort((a, b) => a.blockNumber - b.blockNumber));
 }
 
-export async function blocks({startBlock, endBlock, network}: {startBlock: number, endBlock: number, network: Network}) {
+export async function blocks({startBlock, endBlock, fromActiveProducerOnly, network}: {startBlock: number, endBlock: number, fromActiveProducerOnly: boolean, network: Network}) {
     const promise = graphResultsPager({
         api: GRAPH_API_ENDPOINTS[network].governance,
         query: {
@@ -79,7 +79,8 @@ export async function blocks({startBlock, endBlock, network}: {startBlock: numbe
             selection: {
                 where: {
                     number_gte: startBlock,
-                    number_lte: endBlock
+                    number_lte: endBlock,
+                    fromActiveProducer: fromActiveProducerOnly ? true : undefined
                 }
             },
             properties: block.properties
@@ -91,16 +92,17 @@ export async function blocks({startBlock, endBlock, network}: {startBlock: numbe
         .then(results => results.sort((a, b) => a.number - b.number));
 }
 
-export async function blocksPaged({start, num, network}: {start: number, num: number, network: Network}) {
+export async function blocksPaged({start, num, fromActiveProducerOnly, network}: {start: number, num: number, fromActiveProducerOnly: boolean, network: Network}) {
+    const condition = fromActiveProducerOnly ? `, where: {fromActiveProducer: true}` : '';
     const result = await request(GRAPH_API_ENDPOINTS[network].governance,
         gql`{
-                blocks(orderBy: number, orderDirection: desc, first: ${num}, skip: ${start}) {
+                blocks(orderBy: number, orderDirection: desc, first: ${num}, skip: ${start}${condition}) {
                     ${block.properties.toString()}
                 }
             }`
     );
 
-    return result.blocks ? producerProperties.callback(result.blocks) : undefined;
+    return result.blocks ? block.callback(result.blocks) : undefined;
 }
 
 export async function rewardSchedule({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {

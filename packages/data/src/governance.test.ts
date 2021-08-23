@@ -9,7 +9,7 @@ async function rewardCalculation(network: Network) {
     const allEpochs = (await epochs({startEpochNumber: 1, endEpochNumber: currentRewardSchedule.lastEpoch.epochNumber, includeRewards: true, network}));
     const startEpoch = allEpochs[0];
     const [startBlockResult, startRewardScheduleResult] = await Promise.all([
-        blocks({startBlock: startEpoch.startBlock?.number, endBlock: startEpoch.endBlock?.number, network}),
+        blocks({startBlock: startEpoch.startBlock?.number, endBlock: startEpoch.endBlock?.number, fromActiveProducerOnly: false, network}),
         rewardSchedule({block: startEpoch.startBlock?.number, network})
     ]);
     
@@ -29,7 +29,7 @@ async function rewardCalculation(network: Network) {
 
         const epoch = allEpochs[i];
         const [blockResult, rewardScheduleResult, producersResult] = await Promise.all([
-            blocks({startBlock: epoch.startBlock?.number, endBlock: epoch.endBlock?.number, network}),
+            blocks({startBlock: epoch.startBlock?.number, endBlock: epoch.endBlock?.number, fromActiveProducerOnly: true, network}),
             rewardSchedule({block: epoch.startBlock?.number, network}),
             producers({block: epoch.endBlock?.number + 1, network})
         ]);
@@ -130,6 +130,7 @@ describe("governance", () => {
             const results = await blocks({
                 startBlock: 10766656,
                 endBlock:  10766657,
+                fromActiveProducerOnly: false,
                 network: 'ropsten'
             });
             expect(results.length).toEqual(2);
@@ -148,8 +149,10 @@ describe("governance", () => {
 
     describe("blocksPaged", () => {
         it("mainnet", async () => {
-            const results = await blocksPaged({start: 0, num: 10, network: "mainnet"});
+            const results = await blocksPaged({start: 0, num: 10, fromActiveProducerOnly: true, network: "mainnet"});
             expect(results.length).toEqual(10);
+            expect(results[0].fromActiveProducer).toStrictEqual(true);
+            expect(results[0].number).toBeGreaterThan(0);
         });
     });
 
