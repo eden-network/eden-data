@@ -261,7 +261,7 @@ interface RewardSchedule {
         epochNumber: string,
         producerBlocks: string,
         allBlocks: string,
-        producerBlocksPercentage: string
+        producerBlocksRatio: string
     },
     activeRewardScheduleEntry?: {
         startTime: string,
@@ -303,7 +303,7 @@ const rewardScheduleProperties = {
                 epochNumber: Number(rewardSchedule.pendingEpoch.epochNumber),
                 producerBlocks: Number(rewardSchedule.pendingEpoch.producerBlocks),
                 allBlocks: Number(rewardSchedule.pendingEpoch.allBlocks),
-                producerBlocksPercentage: Number(rewardSchedule.pendingEpoch.producerBlocksPercentage)
+                producerBlocksRatio: Number(rewardSchedule.pendingEpoch.producerBlocksRatio)
             } : undefined,
             activeRewardScheduleEntry: rewardSchedule.activeRewardScheduleEntry ? {
                 startTime: Number(rewardSchedule.activeRewardScheduleEntry.startTime),

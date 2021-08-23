@@ -169,6 +169,13 @@ describe("governance", () => {
             expect(result?.pendingEpoch).not.toBeUndefined();
             expect(result?.pendingEpoch.epochNumber).toEqual(42);
         });
+
+        it("mainnet", async () => {
+            const result = await rewardSchedule();
+
+            expect(result).not.toBeUndefined();
+            expect(result.pendingEpoch.producerBlocksRatio).toBeGreaterThan(0);
+        });
     });
 
     describe("reward calculation", () => {
