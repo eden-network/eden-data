@@ -162,3 +162,169 @@ type Epoch @entity {
     # Snapshot of rewards
     producerRewards: [ProducerEpoch!]! @derivedFrom(field: "epoch")
 }
+
+type SlotClaim @entity {
+    # Transaction
+    id: ID!
+
+    # Slot
+    slot: Slot!
+
+    # Owner address
+    owner: Bytes!
+
+    # Winning bid
+    winningBid: BigInt!
+
+    # Old bid
+    oldBid: BigInt!
+
+    # Timestamp of when slot ownership started
+    startTime: BigInt!
+
+    # Timestamp of when slot ownership expires
+    expirationTime: BigInt!
+
+    # Tax rate per day
+    taxRatePerDay: BigDecimal!
+}
+
+type Slot @entity {
+    # Address of network contract + slot index, e.g. "0xF00-0"
+    id: ID!
+
+    # Owner address
+    owner: Bytes!
+
+    # Delegate address
+    delegate: Bytes!
+
+    # Winning bid
+    winningBid: BigInt!
+
+    # Old bid
+    oldBid: BigInt!
+
+    # Timestamp of when slot ownership started
+    startTime: BigInt!
+
+    # Timestamp of when slot ownership expires
+    expirationTime: BigInt!
+
+    # Tax rate per day
+    taxRatePerDay: BigDecimal!
+
+    # Slot claims
+    claims: [SlotClaim]! @derivedFrom(field: "slot")
+}
+
+type Staker @entity {
+    # Address of staker
+    id: ID!
+
+    # Amount staked
+    staked: BigInt!
+
+    # Zero-based (zero being highest) rank of non-zero stakers, or null for a zero stake
+    rank: BigInt
+}
+
+type Network @entity {
+    # Address of contract 
+    id: ID!
+
+    slot0: Slot
+    slot1: Slot
+    slot2: Slot
+
+    stakers: [Staker!]!
+
+    # Number of non-zero stakers
+    numStakers: BigInt
+
+    # Total amount staked
+    totalStaked: BigInt!
+
+    # Percentiles (0-99) of staker amounts
+    stakedPercentiles: [BigInt!]!
+}
+
+type Distributor @entity {
+    # Address of distributor contract
+    id: ID!
+
+    # The current distribution
+    currentDistribution: Distribution
+}
+
+type Distribution @entity {
+    # Transaction 
+    id: ID!
+
+    # Distributor
+    distributor: Distributor!
+
+    # Timestamp distribution was applied
+    timestamp: BigInt!
+
+    # Distribution number
+    distributionNumber: BigInt!
+
+    # Root of the merkle tree containing total earned rewards
+    merkleRoot: Bytes!
+
+    # Metadata URI
+    metadataURI: String!
+}
+
+type Claim @entity {
+    # Transaction 
+    id: ID!
+
+    # Timestamp claim was made
+    timestamp: BigInt!
+
+    # Index in the merkle tree
+    index: BigInt!
+
+    # Account
+    account: Account!
+
+    # Total amount earned
+    totalEarned: BigInt!
+
+    # Claimed amount by this claim
+    claimed: BigInt!
+}
+
+type Slash @entity {
+    # Transaction 
+    id: ID!
+
+    # Timestamp slash was made
+    timestamp: BigInt!
+
+    # Account
+    account: Account!
+
+    # Slashed amount by this slash
+    slashed: BigInt!
+}
+
+type Account @entity {
+    # Account address
+    id: ID!
+
+    # Total amount claimed
+    totalClaimed: BigInt!
+
+    # Total amount slashed
+    totalSlashed: BigInt!
+
+    # All claims
+    claims: [Claim!]! @derivedFrom(field: "account")
+
+    # All slashes
+    slashes: [Slash!]! @derivedFrom(field: "account")
+}
+
