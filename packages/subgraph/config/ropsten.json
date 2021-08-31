@@ -1,0 +1,9 @@
+{
+    "network": "ropsten",
+    "govAddress": "0x2eE6aF00AFd2470f4421F4F5198bD4B30efcbeE2",
+    "govStartBlock": "10746923",
+    "networkAddress": "0xaa75DE4acC8590CF8299106b24656cDa2357C458",
+    "networkStartBlock": "10753059",
+    "distributorAddress": "0x705b28c4214766F4c7Ef599ed98832D967357303",
+    "distributorStartBlock": "10746924"
+}

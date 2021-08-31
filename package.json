@@ -9,6 +9,13 @@
         "node": ">=10"
     },
     "scripts": {
+        "graph:codegen": "yarn workspace @eden-network/subgraph codegen",
+        "graph:build": "yarn workspace @eden-network/subgraph build",
+        "graph:deploy": "yarn workspace @eden-network/subgraph deploy-studio:mainnet",
+        "graph:deploy:hosted": "yarn workspace @eden-network/subgraph deploy-hosted:mainnet",
+        "graph:deploy:ropsten": "yarn workspace @eden-network/subgraph deploy-hosted:ropsten",
+        "graph:prepare:ropsten": "yarn workspace @eden-network/subgraph prepare:ropsten",
+        "graph:prepare:mainnet": "yarn workspace @eden-network/subgraph prepare:mainnet",
         "data:build": "yarn workspace @eden-network/data build",
         "data:test": "yarn workspace @eden-network/data test"
     },
@@ -16,6 +23,10 @@
     "workspaces": {
         "packages": [
             "packages/**"
+        ],
+        "nohoist": [
+            "packages/subgraph/@graphprotocol/graph-ts",
+            "packages/subgraph/@graphprotocol/graph-ts/**"
         ]
     }
 }

@@ -1,0 +1,9 @@
+{
+    "network": "mainnet",
+    "govAddress": "0x726aDC632871Ff796379da14F9D5aeb199bEd505",
+    "govStartBlock": "12948292",
+    "networkAddress": "0x9E3382cA57F4404AC7Bf435475EAe37e87D1c453",
+    "networkStartBlock": "12948381",
+    "distributorAddress": "0x2Ae0f92498346B9e011ED15d8C98142DCF62F774",
+    "distributorStartBlock": "12948356"
+}
