@@ -9,8 +9,8 @@
         "create-local": "dotenv -e .env -- cross-var graph create --node %GRAPH_NODE% eden-distributor/governance",
         "remove-local": "dotenv -e .env -- cross-var graph remove --node %GRAPH_NODE% eden-distributor/governance",
         "deploy-local": "dotenv -e .env -- cross-var graph deploy --node %GRAPH_NODE% --ipfs %IPFS_NODE% eden-distributor/governance",
-        "deploy-hosted:ropsten": "dotenv -e .env -- cross-var graph deploy --product hosted-service jquesnelle/governance",
-        "deploy-hosted:mainnet": "dotenv -e .env -- cross-var graph deploy --product hosted-service eden-network/governance",
+        "deploy-hosted:ropsten": "dotenv -e .env -- cross-var graph deploy --product hosted-service eden-network/eden-network-ropsten",
+        "deploy-hosted:mainnet": "dotenv -e .env -- cross-var graph deploy --product hosted-service eden-network/eden-network",
         "deploy-studio:mainnet": "dotenv -e .env -- cross-var graph deploy --studio eden-network-governance",
         "prepare:ropsten": "mustache config/ropsten.json subgraph.template.yaml > subgraph.yaml",
         "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml"
