@@ -6,9 +6,9 @@
     "scripts": {
         "codegen": "graph codegen subgraph.yaml",
         "build": "graph build subgraph.yaml",
-        "create-local": "dotenv -e .env -- cross-var graph create --node %GRAPH_NODE% eden-distributor/governance",
-        "remove-local": "dotenv -e .env -- cross-var graph remove --node %GRAPH_NODE% eden-distributor/governance",
-        "deploy-local": "dotenv -e .env -- cross-var graph deploy --node %GRAPH_NODE% --ipfs %IPFS_NODE% eden-distributor/governance",
+        "create-local": "dotenv -e .env -- cross-var graph create --node %GRAPH_NODE% eden-network/eden-network",
+        "remove-local": "dotenv -e .env -- cross-var graph remove --node %GRAPH_NODE% eden-network/eden-network",
+        "deploy-local": "dotenv -e .env -- cross-var graph deploy --node %GRAPH_NODE% --ipfs %IPFS_NODE% eden-network/eden-network",
         "deploy-hosted:ropsten": "dotenv -e .env -- cross-var graph deploy --product hosted-service eden-network/eden-network-ropsten",
         "deploy-hosted:mainnet": "dotenv -e .env -- cross-var graph deploy --product hosted-service eden-network/eden-network",
         "deploy-studio:mainnet": "dotenv -e .env -- cross-var graph deploy --studio eden-network-governance",
