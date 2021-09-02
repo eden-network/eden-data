@@ -2,13 +2,13 @@ import { request, gql } from 'graphql-request';
 import { GRAPH_API_ENDPOINTS, NETWORK_CONTRACT, Network } from './constants';
 const graphResultsPager = require('graph-results-pager');
 
-export async function stakeStats({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {
+export async function stakeStats({block, network, includePercentiles}: {block?: number, network: Network, includePercentiles: boolean} = {network: 'mainnet', includePercentiles: true}) {
     const blockCondition = block ? `block: { number: ${block} }` : '';
 
     const result = await request(GRAPH_API_ENDPOINTS[network].network,
         gql`{
                 network(id: "${NETWORK_CONTRACT[network].address}", ${blockCondition}) {
-                    ${stakeStatsProperies.properties.toString()}
+                    ${includePercentiles ? stakeStatsProperies.properties.toString() : stakeStatsProperies.propertiesWithoutPercentiles.toString()}
                 }
             }`
     );
@@ -100,7 +100,7 @@ interface StakeStats {
     id: string,
     numStakers: string,
     totalStaked: string
-    stakedPercentiles: string[]
+    stakedPercentiles?: string[]
 }
 
 const stakeStatsProperies = {
@@ -111,12 +111,18 @@ const stakeStatsProperies = {
         'stakedPercentiles'
     ],
 
+    propertiesWithoutPercentiles: [
+        'id',
+        'numStakers',
+        'totalStaked'
+    ],
+
     callback(results: StakeStats[]) {
         return results.map(network => { return {
             id: network.id,
             numStakers: Number(network.numStakers),
             totalStaked: BigInt(network.totalStaked),
-            stakedPercentiles: network.stakedPercentiles.map(x => BigInt(x))
+            stakedPercentiles: network.stakedPercentiles !== undefined ? network.stakedPercentiles.map(x => BigInt(x)) : undefined
         }});
     }
 }

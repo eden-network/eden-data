@@ -1,4 +1,4 @@
-import { staker, stakeStats, slots, stakers, stakerLeaderboard, slotClaims } from "./";
+import { staker, stakeStats, slots, stakers, stakerLeaderboard, slotClaims, timeseries } from "./";
 
 describe("network", () => {
     describe("staker", () => {
@@ -40,11 +40,31 @@ describe("network", () => {
 
     describe("stakeStats", () => {
         it("mainnet", async () => {
-            const result = await stakeStats({block: 13069287, network: "mainnet"});
+            const result = await stakeStats({block: 13069287, network: "mainnet", includePercentiles: true});
             expect(result).not.toBeUndefined();
             expect(result.numStakers).toEqual(739);
             expect(result.totalStaked).toEqual(BigInt("1287612749679959946014557"));
-            expect(result.stakedPercentiles.length).toEqual(100);
+            expect(result.stakedPercentiles?.length).toEqual(100);
+        });
+
+        it("mainnet timeseries", async () => {
+            const result = await timeseries({blocks: [13148000, 13147000, 13146000], network: "mainnet", target: stakeStats}, {includePercentiles: false});
+            expect(result).not.toBeUndefined();
+
+            expect(result[0].block).toEqual(13148000);
+            expect(result[0].data.numStakers).toEqual(1794);
+            expect(result[0].data.totalStaked).toEqual(BigInt("4244505866143056306602141"));
+            expect(result[0].data.stakedPercentiles).toBeUndefined();
+
+            expect(result[1].block).toEqual(13147000);
+            expect(result[1].data.numStakers).toEqual(1780);
+            expect(result[1].data.totalStaked).toEqual(BigInt("4045687347421179919289751"));
+            expect(result[2].data.stakedPercentiles).toBeUndefined();
+
+            expect(result[2].block).toEqual(13146000);
+            expect(result[2].data.numStakers).toEqual(1773);
+            expect(result[2].data.totalStaked).toEqual(BigInt("4000305237548249344695752"));
+            expect(result[2].data.stakedPercentiles).toBeUndefined();
         });
     });
 
