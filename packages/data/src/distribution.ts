@@ -1,13 +1,14 @@
 import { request, gql } from 'graphql-request';
 import { GRAPH_API_ENDPOINTS, DISTRIBUTOR_CONTRACT, Network } from './constants';
+import { makeCodition, timestampToBlock } from './governance';
 const graphResultsPager = require('graph-results-pager');
 
-export async function currentDistribution({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function currentDistribution({block, timestamp, network}: {block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].distribution,
         gql`{
-                distributor(id: "${DISTRIBUTOR_CONTRACT[network]?.address}", ${blockCondition}) {
+                distributor(id: "${DISTRIBUTOR_CONTRACT[network]?.address}", ${condition}) {
                     currentDistribution {
                         ${distributionProperties.properties.toString()}
                     }
@@ -20,13 +21,12 @@ export async function currentDistribution({block, network}: {block?: number, net
         : undefined;
 }
 
-export async function distribution({distributionNumber, block, network}: {distributionNumber: number, block?: number, network: Network}) {
-
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function distribution({distributionNumber, block, timestamp, network}: {distributionNumber: number, block?: number, timestamp?: number, network: Network}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].distribution,
         gql`{
-                distributions(where: {distributionNumber: ${distributionNumber}}, ${blockCondition}) {
+                distributions(where: {distributionNumber: ${distributionNumber}}, ${condition}) {
                     ${distributionProperties.properties.toString()}
                 }
             }`
@@ -35,13 +35,13 @@ export async function distribution({distributionNumber, block, network}: {distri
     return result.distributions ? distributionProperties.callback(result.distributions)[0] : undefined;
 }
 
-export async function distributions({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {
+export async function distributions({block, timestamp, network}: {block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
     const promise = graphResultsPager({
         api: GRAPH_API_ENDPOINTS[network].distribution,
         query: {
             entity: 'distributions',
             selection: {
-                block: block ? { number: block } : undefined
+                block: block ? { number: block } : timestamp ? { number: await timestampToBlock(timestamp, network) } : undefined
             },
             properties: distributionProperties.properties
         }
@@ -52,13 +52,12 @@ export async function distributions({block, network}: {block?: number, network: 
         .then(results => results.sort((a, b) => a.distributionNumber - b.distributionNumber));
 }
 
-export async function account({accountAddress, block, network}: {accountAddress: string, block?: number, network: Network}) {
-
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function account({accountAddress, block, timestamp, network}: {accountAddress: string, block?: number, timestamp?: number, network: Network}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].distribution,
         gql`{
-                account(id: "${accountAddress.toLowerCase()}", ${blockCondition}) {
+                account(id: "${accountAddress.toLowerCase()}", ${condition}) {
                     ${accountProperties.properties.toString()}
                 }
             }`
@@ -82,13 +81,13 @@ export async function accounts({block, network}: {block?: number, network: Netwo
     return promise.then(results => accountProperties.callback(results));
 }
 
-export async function claims({accountAddress, block, network}: {accountAddress?: string, block?: number, network: Network} = {network: 'mainnet'}) {
+export async function claims({accountAddress, block, timestamp, network}: {accountAddress?: string, block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
     const promise = graphResultsPager({
         api: GRAPH_API_ENDPOINTS[network].distribution,
         query: {
             entity: 'claims',
             selection: {
-                block: block ? { number: block } : undefined,
+                block: block ? { number: block } : timestamp ? { number: await timestampToBlock(timestamp, network) } : undefined,
                 where: accountAddress ? {
                     account: accountAddress
                 } : undefined
@@ -102,13 +101,13 @@ export async function claims({accountAddress, block, network}: {accountAddress?:
         .then(results => results.sort((a, b) => a.timestamp - b.timestamp));
 }
 
-export async function slashes({accountAddress, block, network}: {accountAddress?: string, block?: number, network: Network} = {network: 'mainnet'}) {
+export async function slashes({accountAddress, block, timestamp, network}: {accountAddress?: string, block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
     const promise = graphResultsPager({
         api: GRAPH_API_ENDPOINTS[network].distribution,
         query: {
             entity: 'slashes',
             selection: {
-                block: block ? { number: block } : undefined,
+                block: block ? { number: block } : timestamp ? { number: await timestampToBlock(timestamp, network) } : undefined,
                 where: accountAddress ? {
                     account: accountAddress
                 } : undefined

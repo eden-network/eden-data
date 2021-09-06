@@ -1,13 +1,14 @@
 import { request, gql } from 'graphql-request';
 import { GRAPH_API_ENDPOINTS, NETWORK_CONTRACT, Network } from './constants';
+import { makeCodition, timestampToBlock } from './governance';
 const graphResultsPager = require('graph-results-pager');
 
-export async function stakeStats({block, network, includePercentiles}: {block?: number, network: Network, includePercentiles: boolean} = {network: 'mainnet', includePercentiles: true}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function stakeStats({block, network, timestamp, includePercentiles}: {block?: number, timestamp?: number, network: Network, includePercentiles: boolean} = {network: 'mainnet', includePercentiles: true}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].network,
         gql`{
-                network(id: "${NETWORK_CONTRACT[network].address}", ${blockCondition}) {
+                network(id: "${NETWORK_CONTRACT[network].address}", ${condition}) {
                     ${includePercentiles ? stakeStatsProperies.properties.toString() : stakeStatsProperies.propertiesWithoutPercentiles.toString()}
                 }
             }`
@@ -16,12 +17,12 @@ export async function stakeStats({block, network, includePercentiles}: {block?: 
     return result.network ? stakeStatsProperies.callback([result.network])[0] : undefined;
 }
 
-export async function staker({staker, block, network}: {staker: string, block?: number, network: Network}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function staker({staker, block, timestamp, network}: {staker: string, block?: number, timestamp?: number, network: Network}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].network,
         gql`{
-                staker(id: "${staker}", ${blockCondition}) {
+                staker(id: "${staker}", ${condition}) {
                     ${stakerProperties.properties.toString()}
                 }
             }`
@@ -30,13 +31,13 @@ export async function staker({staker, block, network}: {staker: string, block?: 
     return result.staker ? stakerProperties.callback([result.staker])[0] : undefined;
 }
 
-export async function stakers({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {
+export async function stakers({block, timestamp, network}: {block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
     const promise = graphResultsPager({
         api: GRAPH_API_ENDPOINTS[network].network,
         query: {
             entity: 'stakers',
             selection: {
-                block: block ? { number: block } : undefined
+                block: block ? { number: block } : timestamp ? { number: await timestampToBlock(timestamp, network) } : undefined
             },
             properties: stakerProperties.properties
         }
@@ -47,12 +48,12 @@ export async function stakers({block, network}: {block?: number, network: Networ
         .then(results => results.sort((a, b) => a.rank - b.rank));
 }
 
-export async function stakerLeaderboard({block, network, start, num}: {block?: number, start: number, num: number, network: Network}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function stakerLeaderboard({block, network, timestamp, start, num}: {block?: number, timestamp?: number, start: number, num: number, network: Network}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].network,
         gql`{
-                stakers(where: {rank_gte: ${start}}, orderBy: rank, first: ${num}, ${blockCondition}) {
+                stakers(where: {rank_gte: ${start}}, orderBy: rank, first: ${num}, ${condition}) {
                     ${stakerProperties.properties.toString()}
                 }
             }`
@@ -61,12 +62,12 @@ export async function stakerLeaderboard({block, network, start, num}: {block?: n
     return result.stakers ? stakerProperties.callback(result.stakers) : undefined;
 }
 
-export async function slots({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function slots({block, timestamp, network}: {block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].network,
         gql`{
-                network(id: "${NETWORK_CONTRACT[network].address}", ${blockCondition}) {
+                network(id: "${NETWORK_CONTRACT[network].address}", ${condition}) {
                     slot0 { ${slotProperties.properties.toString()} },
                     slot1 { ${slotProperties.properties.toString()} },
                     slot2 { ${slotProperties.properties.toString()} }
@@ -79,13 +80,13 @@ export async function slots({block, network}: {block?: number, network: Network}
         : undefined;
 }
 
-export async function slotClaims({block, slotIndex, network}: {block?: number, slotIndex: number, network: Network}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function slotClaims({block, timestamp, slotIndex, network}: {block?: number, timestamp?: number, slotIndex: number, network: Network}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const key = `slot${slotIndex}`;
     const result = await request(GRAPH_API_ENDPOINTS[network].network,
         gql`{
-                network(id: "${NETWORK_CONTRACT[network].address}", ${blockCondition}) {
+                network(id: "${NETWORK_CONTRACT[network].address}", ${condition}) {
                     ${key} { claims {${slotClaimProperties.properties.toString()} } }
                 }
             }`

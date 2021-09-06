@@ -47,7 +47,7 @@ describe("network", () => {
             expect(result.stakedPercentiles?.length).toEqual(100);
         });
 
-        it("mainnet timeseries", async () => {
+        it("mainnet timeseries blocks", async () => {
             const result = await timeseries({blocks: [13148000, 13147000, 13146000], network: "mainnet", target: stakeStats}, {includePercentiles: false});
             expect(result).not.toBeUndefined();
 
@@ -65,6 +65,15 @@ describe("network", () => {
             expect(result[2].data.numStakers).toEqual(1773);
             expect(result[2].data.totalStaked).toEqual(BigInt("4000305237548249344695752"));
             expect(result[2].data.stakedPercentiles).toBeUndefined();
+        });
+
+        it("mainnet timeseries timestamps", async () => {
+            const result = await timeseries({timestamps: [1630764013], network: "mainnet", target: stakeStats}, {includePercentiles: false});
+
+            expect(result[0].timestamp).toEqual(1630764013);
+            expect(result[0].data.numStakers).toEqual(1885);
+            expect(result[0].data.totalStaked).toEqual(BigInt("4694047885628400475571953"));
+            expect(result[0].data.stakedPercentiles).toBeUndefined();
         });
     });
 

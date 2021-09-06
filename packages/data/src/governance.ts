@@ -1,13 +1,36 @@
 import { request, gql } from 'graphql-request';
 import { GRAPH_API_ENDPOINTS, GOVERNANCE_CONTRACT, Network } from './constants';
-const graphResultsPager = require('graph-results-pager')
+const graphResultsPager = require('graph-results-pager');
 
-export async function producer({producerAddress, block, network}: {producerAddress: string, block?: number, network: Network}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function timestampToBlock(timestamp: number, network: Network) {
+    timestamp = String(timestamp).length > 10 ? Math.floor(timestamp / 1000) : timestamp;
 
     const result = await request(GRAPH_API_ENDPOINTS[network].governance,
         gql`{
-                producer(id: "${producerAddress.toLowerCase()}", ${blockCondition}) {
+            blocks(first: 1, orderBy: timestamp, orderDirection: desc, where: { timestamp_lte: ${timestamp} }) {
+                number
+            }
+        }`
+    );
+
+    return Number(result.blocks[0].number);
+}
+
+export async function makeCodition({block, timestamp, network}: {block?: number, timestamp?: number, network: Network}) {
+    if (block)
+        return `block: { number: ${block} }`;
+    else if (timestamp)
+        return `block: { number: ${await timestampToBlock(timestamp, network)} }`;
+    else
+        return '';
+}
+
+export async function producer({producerAddress, block, timestamp, network}: {producerAddress: string, block?: number, timestamp?: number, network: Network}) {
+    const condition = await makeCodition({block, timestamp, network});
+
+    const result = await request(GRAPH_API_ENDPOINTS[network].governance,
+        gql`{
+                producer(id: "${producerAddress.toLowerCase()}", ${condition}) {
                     ${producerProperties.properties.toString()}
                 }
             }`
@@ -16,13 +39,13 @@ export async function producer({producerAddress, block, network}: {producerAddre
     return result.producer ? producerProperties.callback([result.producer])[0] : undefined;
 }
 
-export async function producers({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {
+export async function producers({block, timestamp, network}: {block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
     const promise = graphResultsPager({
         api: GRAPH_API_ENDPOINTS[network].governance,
         query: {
             entity: 'producers',
             selection: {
-                block: block ? { number: block } : undefined
+                block: block ? { number: block } : timestamp ? { number: await timestampToBlock(timestamp, network) } : undefined
             },
             properties: producerProperties.properties
         }
@@ -105,12 +128,12 @@ export async function blocksPaged({start, num, fromActiveProducerOnly, network}:
     return result.blocks ? block.callback(result.blocks) : undefined;
 }
 
-export async function rewardSchedule({block, network}: {block?: number, network: Network} = {network: 'mainnet'}) {
-    const blockCondition = block ? `block: { number: ${block} }` : '';
+export async function rewardSchedule({block, timestamp, network}: {block?: number, timestamp?: number, network: Network} = {network: 'mainnet'}) {
+    const condition = await makeCodition({block, timestamp, network});
 
     const result = await request(GRAPH_API_ENDPOINTS[network].governance,
         gql`{
-                rewardSchedule(id: "${GOVERNANCE_CONTRACT[network].address}", ${blockCondition}) {
+                rewardSchedule(id: "${GOVERNANCE_CONTRACT[network].address}", ${condition}) {
                     ${rewardScheduleProperties.properties.toString()}
                 }
             }`
