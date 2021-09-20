@@ -1,6 +1,6 @@
 {
   "name": "@eden-network/data",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "author": "Jeffrey Quesnelle <jeff@edennetwork.io>",
@@ -20,7 +20,7 @@
   "dependencies": {
     "ethereumjs-util": "^7.0.10",
     "ethers": "^5.3.1",
-    "graph-results-pager": "https://github.com/LufyCZ/graph-results-pager",
+    "graph-results-pager": "https://github.com/chpiatt/graph-results-pager",
     "graphql": "^15.5.1",
     "graphql-request": "^3.4.0",
     "ts-node": "^10.0.0",
