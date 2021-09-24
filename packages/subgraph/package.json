@@ -1,7 +1,7 @@
 {
     "name": "@eden-network/subgraph",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "author": "Jeffrey Quesnelle <jeff@edennetwork.io>",
     "scripts": {
         "codegen": "graph codegen subgraph.yaml",
@@ -16,7 +16,8 @@
         "prepare:mainnet": "mustache config/mainnet.json subgraph.template.yaml > subgraph.yaml"
     },
     "devDependencies": {
-        "@graphprotocol/graph-cli": "^0.21.0",
+        "@graphprotocol/graph-cli": "^0.21.1",
+        "@graphprotocol/graph-ts": "^0.20.1",
         "cross-var": "^1.1.0",
         "dotenv-cli": "^4.0.0",
         "mustache": "^4.2.0",
