@@ -15,7 +15,7 @@ const GRAPH_API_ENDPOINTS: { [key in Network]: GraphQLEndpoints} = {
     ['ropsten']: {
         governance: process.env['GRAPH_ROPSTEN_GOVERNANCE'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-ropsten',
         distribution: process.env['GRAPH_ROPSTEN_DISTRIBUTION'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-ropsten',
-        network: process.env['GRAPH_MAINNET_NETWORK'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-ropsten'
+        network: process.env['GRAPH_ROPSTEN_NETWORK'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-ropsten'
     }
 };
 
