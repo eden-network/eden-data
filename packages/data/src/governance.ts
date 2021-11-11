@@ -1,5 +1,5 @@
 import { request, gql } from 'graphql-request';
-import { GRAPH_API_ENDPOINTS, GOVERNANCE_CONTRACT, Network } from './constants';
+import { GRAPH_API_ENDPOINTS, GOVERNANCE_CONTRACT, Network, GRAPH_MAX_ENTITIES_IN_QUERY } from './constants';
 const graphResultsPager = require('graph-results-pager');
 
 export async function timestampToBlock(timestamp: number, network: Network) {
@@ -95,24 +95,31 @@ export async function producerRewardCollectorChanges({startBlock, endBlock, netw
 }
 
 export async function blocks({startBlock, endBlock, fromActiveProducerOnly, network}: {startBlock: number, endBlock: number, fromActiveProducerOnly: boolean, network: Network}) {
-    const promise = graphResultsPager({
-        api: GRAPH_API_ENDPOINTS[network].governance,
-        query: {
-            entity: 'blocks',
-            selection: {
-                where: {
-                    number_gte: startBlock,
-                    number_lte: endBlock,
-                    fromActiveProducer: fromActiveProducerOnly ? true : undefined
-                }
-            },
-            properties: block.properties
-        }
-    }) as Promise<Block[]>;
+    const numBlocks = endBlock - startBlock + 1;
+    let numChunks = Math.floor(numBlocks / GRAPH_MAX_ENTITIES_IN_QUERY);
+    let lastAmount = numBlocks % GRAPH_MAX_ENTITIES_IN_QUERY;
+    if (lastAmount !== 0)
+        ++numChunks
+    else
+        lastAmount = GRAPH_MAX_ENTITIES_IN_QUERY;
 
-    return promise
-        .then(results => block.callback(results))
-        .then(results => results.sort((a, b) => a.number - b.number));
+    const condition = fromActiveProducerOnly ? `, fromActiveProducer: true` : '';
+    const promises = [...Array(numChunks).keys()]
+        .map(x => x * GRAPH_MAX_ENTITIES_IN_QUERY)
+        .map((offset, index) => {
+            const start = startBlock + offset;
+            const end = start + (index === numChunks - 1 ? lastAmount : GRAPH_MAX_ENTITIES_IN_QUERY) - 1;
+            return request(GRAPH_API_ENDPOINTS[network].governance,
+                gql`{
+                        blocks(orderBy: number, orderDirection: asc, where: { number_gte: ${start}, number_lte: ${end}${condition} }) {
+                            ${block.properties.toString()}
+                        }
+                    }`
+            );
+        });
+
+    return Promise.all(promises)
+        .then(results => results.flatMap(result => result.blocks ? block.callback(result.blocks) : []));
 }
 
 export async function blocksPaged({start, num, fromActiveProducerOnly, network}: {start: number, num: number, fromActiveProducerOnly: boolean, network: Network}) {

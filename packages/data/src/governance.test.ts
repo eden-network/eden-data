@@ -4,9 +4,9 @@ import {
     producers, producerSetChanges, rewardSchedule
 } from "./";
 
-async function rewardCalculation(network: Network) {
+async function rewardCalculation(network: Network, endEpochNumber?: number) {
     const currentRewardSchedule = await rewardSchedule({network});
-    const allEpochs = (await epochs({startEpochNumber: 1, endEpochNumber: currentRewardSchedule.lastEpoch.epochNumber, includeRewards: true, network}));
+    const allEpochs = (await epochs({startEpochNumber: 1, endEpochNumber: endEpochNumber ?? currentRewardSchedule.lastEpoch.epochNumber, includeRewards: true, network}));
     const startEpoch = allEpochs[0];
     const [startBlockResult, startRewardScheduleResult] = await Promise.all([
         blocks({startBlock: startEpoch.startBlock?.number, endBlock: startEpoch.endBlock?.number, fromActiveProducerOnly: false, network}),
@@ -129,11 +129,11 @@ describe("governance", () => {
         it("ropsten", async () => {
             const results = await blocks({
                 startBlock: 10766656,
-                endBlock:  10766657,
+                endBlock:  10767992,
                 fromActiveProducerOnly: false,
                 network: 'ropsten'
             });
-            expect(results.length).toEqual(2);
+            expect(results.length).toEqual(1337);
 
             expect(results[0].number).toEqual(10766656);
             expect(results[0].id).toEqual("0x3224b0dcf26fdb05ebc7f3f63a38f2315ddbf5f41ef33dacd368c8d404a9400e");
@@ -182,7 +182,7 @@ describe("governance", () => {
     });
 
     describe("reward calculation", () => {
-        it("ropsten", async () => rewardCalculation("ropsten"));
-        it("mainnet", async () => rewardCalculation("mainnet"));
+        it("ropsten", async () => rewardCalculation("ropsten", 10));
+        it("mainnet", async () => rewardCalculation("mainnet", 10));
     })
 });

@@ -63,7 +63,10 @@ const TOKEN_CONTRACT: { [key in Network]: {address: string, startBlock: number} 
     }
 }
 
-export { 
+const GRAPH_MAX_ENTITIES_IN_QUERY = 100;
+
+export {
+    GRAPH_MAX_ENTITIES_IN_QUERY,
     GRAPH_API_ENDPOINTS,
     GOVERNANCE_CONTRACT, DISTRIBUTOR_CONTRACT, NETWORK_CONTRACT, TOKEN_CONTRACT,
     Network 
