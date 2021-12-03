@@ -2,6 +2,11 @@
 
 This repository contains tools for collecting and reporting on data in the Eden Network.
 
+To install:
+```sh
+yarn add @eden-network/data
+```
+
 ## subgraph
 
 This subgraph indexes distributions of rewards, slot tenant changes and staking of EDEN, additions/removals of block producers from Eden Network, as well as calculates the rewards due to them based on their relative block production ratio as applied to the active emission schedule.
