@@ -1,0 +1,9 @@
+{
+    "network": "ropsten",
+    "tokenAddress": "0x1559FA1b8F28238FD5D76D9f434ad86FD20D1559",
+    "tokenStartBlock": "10727375",
+    "networkAddress": "0xaa75DE4acC8590CF8299106b24656cDa2357C458",
+    "networkStartBlock": "10753059",
+    "distributorSEVAddress": "0x7115C01915a5F48c6Ee9135bECBA67eAD4faF180",
+    "distributorSEVStartBlock": "11527073"
+}

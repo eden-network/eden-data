@@ -1,0 +1,9 @@
+{
+    "network": "mainnet",
+    "tokenAddress": "0x1559FA1b8F28238FD5D76D9f434ad86FD20D1559",
+    "tokenStartBlock": "12917300",
+    "networkAddress": "0x9E3382cA57F4404AC7Bf435475EAe37e87D1c453",
+    "networkStartBlock": "12948381",
+    "distributorSEVAddress": "0xBf5cbdfc6ef9b56501edF1d4aC97bF021e595340",
+    "distributorSEVStartBlock": "13717246"
+}

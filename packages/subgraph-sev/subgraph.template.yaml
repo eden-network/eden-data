@@ -1,0 +1,80 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: EdenNetwork
+    network: {{ network }}
+    source:
+      address: '{{ networkAddress }}'
+      abi: EdenNetwork
+      startBlock: {{ networkStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyScript
+      entities:
+        - Staker
+        - Network
+      abis:
+        - name: EdenNetwork
+          file: abis/EdenNetwork.json
+      eventHandlers:
+        - event: Stake(indexed address,uint256)
+          handler: stake
+        - event: Unstake(indexed address,uint256)
+          handler: unstake
+      file: ./src/network.ts
+  - kind: ethereum/contract
+    name: EdenNetworkDistributionSEV
+    network: {{ network }}
+    source:
+      address: '{{ distributorSEVAddress }}'
+      abi: DistributionSEV
+      startBlock: {{ distributorSEVStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyScript
+      entities:
+        - Distributor
+        - Distribution
+        - Claim
+        - Slash
+        - Account
+      abis:
+        - name: DistributionSEV
+          file: abis/MerkleDistributorSEV.json
+      eventHandlers:
+        - event: Claimed(uint256,uint256,indexed address,uint256)
+          handler: claimed
+        - event: Slashed(indexed address,uint256)
+          handler: slashed
+        - event: MerkleRootUpdated(bytes32,uint256,string,uint256)
+          handler: merkleRootUpdated
+        - event: AccountUpdated(indexed address,uint256,uint256)
+          handler: accountUpdated
+        - event: DebtChanged(uint256,uint256)
+          handler: debtChanged
+      file: ./src/distribution.ts
+  - kind: ethereum/contract
+    name: EdenToken
+    network: {{ network }}
+    source:
+      address: '{{ tokenAddress }}'
+      abi: EdenToken
+      startBlock: {{ tokenStartBlock }}
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyScript
+      entities:
+        - Balance
+        - Token
+      abis:
+        - name: EdenToken
+          file: abis/EdenToken.json
+      eventHandlers:
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: transfer
+      file: ./src/token.ts

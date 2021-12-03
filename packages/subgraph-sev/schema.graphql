@@ -1,0 +1,159 @@
+type Staker @entity {
+    # Address of staker
+    id: ID!
+
+    # Index of staker in Network stakers array, for iteration/paging
+    index: BigInt!
+
+    # Amount staked
+    staked: BigInt!
+
+    # Normalized amount staked
+    normalizedStaked: BigInt!
+
+    # Cumulative normalized stake of staker
+    cumulativeNormalizedStaked: BigInt!
+
+    # Last block the cumulative normalized stake of staker was updated
+    cumulativeNormalizedStakedLastBlock: BigInt!
+}
+
+type Network @entity {
+    # Address of contract 
+    id: ID!
+
+    stakers: [Staker!]!
+
+    # Number of stakers (including zero stakers)
+    numStakers: BigInt!
+
+    # Total amount staked
+    totalStaked: BigInt!
+
+    # Total normalized stake
+    totalNormalizedStaked: BigInt!
+
+    # Cumulative normalized stake of all stakers
+    totalCumulativeNormalizedStaked: BigInt!
+
+    # Last block the cumulative normalized stake of all stakers was updated
+    totalCumulativeNormalizedStakedLastBlock: BigInt!
+}
+
+type Distributor @entity {
+    # Address of distributor contract
+    id: ID!
+
+    # The current distribution
+    currentDistribution: Distribution
+
+    # Outstanding debt that has been allocated for in a distrubtion, but not yet claimed or slashed
+    debtTotal: BigInt!
+}
+
+type Distribution @entity {
+    # Transaction 
+    id: ID!
+
+    # Distributor
+    distributor: Distributor!
+
+    # Timestamp distribution was applied
+    timestamp: BigInt!
+
+    # Distribution number
+    distributionNumber: BigInt!
+
+    # Root of the merkle tree containing total earned rewards
+    merkleRoot: Bytes!
+
+    # Metadata URI
+    metadataURI: String!
+
+    # Total number of tokens in distribution
+    tokenTotal: BigInt!
+}
+
+type Claim @entity {
+    # Transaction 
+    id: ID!
+
+    # Timestamp claim was made
+    timestamp: BigInt!
+
+    # Index in the merkle tree
+    index: BigInt!
+
+    # Account
+    account: Account!
+
+    # Total amount earned
+    totalEarned: BigInt!
+
+    # Claimed amount by this claim
+    claimed: BigInt!
+}
+
+type Slash @entity {
+    # Transaction 
+    id: ID!
+
+    # Timestamp slash was made
+    timestamp: BigInt!
+
+    # Account
+    account: Account!
+
+    # Slashed amount by this slash
+    slashed: BigInt!
+}
+
+type Account @entity {
+    # Account address
+    id: ID!
+
+    # Total amount claimed
+    totalClaimed: BigInt!
+
+    # Total amount slashed
+    totalSlashed: BigInt!
+
+    # All claims
+    claims: [Claim!]! @derivedFrom(field: "account")
+
+    # All slashes
+    slashes: [Slash!]! @derivedFrom(field: "account")
+}
+
+type Balance @entity {
+    # Account address
+    id: ID!
+
+    # Index of balance in Token balances array, for iteration/paging
+    index: BigInt!
+
+    # Token balance
+    balance: BigInt!
+}
+
+type Token @entity {
+    # Address of contract 
+    id: ID!
+
+    balances: [Balance!]!
+
+    # Number of balances (including zero balances)
+    numBalances: BigInt!
+
+    # Total supply of token, not including burned tokens
+    totalSupply: BigInt!
+
+    # Circulating supply, not including vesting or DAO tokens
+    circulatingSupply: BigInt!
+
+    # Number of addresses holding a non-zero amount of tokens
+    numHolders: BigInt!
+
+    # Number of token transfers
+    numTransfers: BigInt!
+}

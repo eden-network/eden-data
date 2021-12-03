@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "resolveJsonModule": true,
-    "downlevelIteration": true,
     "lib": ["ES2019"]
   }
 }

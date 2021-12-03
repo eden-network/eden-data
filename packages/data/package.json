@@ -1,6 +1,6 @@
 {
   "name": "@eden-network/data",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "author": "Jeffrey Quesnelle <jeff@edennetwork.io>",
@@ -18,11 +18,13 @@
     "test": "dotenv -e .env -- tsdx test"
   },
   "dependencies": {
+    "bigint-isqrt": "^0.2.1",
     "ethereumjs-util": "^7.0.10",
     "ethers": "^5.3.1",
     "graph-results-pager": "https://github.com/chpiatt/graph-results-pager",
     "graphql": "^15.5.1",
     "graphql-request": "^3.4.0",
+    "lerp": "^1.0.3",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.4"
   },

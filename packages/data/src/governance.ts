@@ -1,5 +1,5 @@
 import { request, gql } from 'graphql-request';
-import { GRAPH_API_ENDPOINTS, GOVERNANCE_CONTRACT, Network, GRAPH_MAX_ENTITIES_IN_QUERY } from './constants';
+import { GRAPH_API_ENDPOINTS, GOVERNANCE_CONTRACT, Network, GRAPH_MAX_ENTITIES_IN_QUERY, range } from './constants';
 const graphResultsPager = require('graph-results-pager');
 
 export async function timestampToBlock(timestamp: number, network: Network) {
@@ -104,7 +104,7 @@ export async function blocks({startBlock, endBlock, fromActiveProducerOnly, netw
         lastAmount = GRAPH_MAX_ENTITIES_IN_QUERY;
 
     const condition = fromActiveProducerOnly ? `, fromActiveProducer: true` : '';
-    const promises = [...Array(numChunks).keys()]
+    const promises = range(numChunks)
         .map(x => x * GRAPH_MAX_ENTITIES_IN_QUERY)
         .map((offset, index) => {
             const start = startBlock + offset;

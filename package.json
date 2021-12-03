@@ -16,6 +16,13 @@
         "graph:deploy:ropsten": "yarn workspace @eden-network/subgraph deploy-hosted:ropsten",
         "graph:prepare:ropsten": "yarn workspace @eden-network/subgraph prepare:ropsten",
         "graph:prepare:mainnet": "yarn workspace @eden-network/subgraph prepare:mainnet",
+        "graph-sev:codegen": "yarn workspace @eden-network/subgraph-sev codegen",
+        "graph-sev:build": "yarn workspace @eden-network/subgraph-sev build",
+        "graph-sev:deploy": "yarn workspace @eden-network/subgraph-sev deploy-studio:mainnet",
+        "graph-sev:deploy:hosted": "yarn workspace @eden-network/subgraph-sev deploy-hosted:mainnet",
+        "graph-sev:deploy:ropsten": "yarn workspace @eden-network/subgraph-sev deploy-hosted:ropsten",
+        "graph-sev:prepare:ropsten": "yarn workspace @eden-network/subgraph-sev prepare:ropsten",
+        "graph-sev:prepare:mainnet": "yarn workspace @eden-network/subgraph-sev prepare:mainnet",
         "data:build": "yarn workspace @eden-network/data build",
         "data:test": "yarn workspace @eden-network/data test"
     },
