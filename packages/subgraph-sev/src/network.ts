@@ -8,8 +8,11 @@ import {
 
 let ZERO = BigInt.fromI32(0);
 let FOUR = BigInt.fromI32(4);
-let ONE_THOUSAND = BigInt.fromI32(1000);
 let WEI = BigInt.fromString("1000000000000000000");
+
+let SEV_FORK_DAMPENING_POINT_BEFORE = BigInt.fromI32(1000);
+let SEV_FORK_DAMPENING_POINT_AFTER = BigInt.fromI32(100000);
+let SEV_FORK_MAINNET_BLOCK = BigInt.fromI32(13987000);
 
 function getNetwork(): Network {
     let network = Network.load(dataSource.address().toHex());
@@ -29,10 +32,10 @@ function getNetwork(): Network {
 }
 
 // f[x_] = Min[x, 1000] + 4 * Sqrt[Max[x - 1000, 0]]
-function normalizeStake(wei: BigInt): BigInt {
+function normalizeStake(wei: BigInt, dampening_point: BigInt): BigInt {
     wei = wei.div(WEI);
-    let base = wei.gt(ONE_THOUSAND) ? ONE_THOUSAND : wei;
-    let extra = wei.gt(ONE_THOUSAND) ? wei.minus(ONE_THOUSAND) : ZERO;
+    let base = wei.gt(dampening_point) ? dampening_point : wei;
+    let extra = wei.gt(dampening_point) ? wei.minus(dampening_point) : ZERO;
     return base.plus(FOUR.times(extra.sqrt())).times(WEI);
 }
 
@@ -79,7 +82,11 @@ function stakeUnstake(address: Address, blockNumber: BigInt): void {
     let oldNormalizedStake = staker.normalizedStaked;
 
     staker.staked = contract.stakedBalance(address);
-    staker.normalizedStaked = normalizeStake(staker.staked);
+    staker.normalizedStaked = normalizeStake(staker.staked,
+        dataSource.network() == 'mainnet' && blockNumber.ge(SEV_FORK_MAINNET_BLOCK)
+        ? SEV_FORK_DAMPENING_POINT_AFTER
+        : SEV_FORK_DAMPENING_POINT_BEFORE
+    );
 
     staker.save();
 

@@ -6,7 +6,6 @@ const lerp = require('lerp');
 
 const ZERO = BigInt(0);
 const FOUR = BigInt(4);
-const ONE_THOUSAND = BigInt(1000);
 const TEN_THOUSAND = BigInt(10000);
 const WEI = BigInt("1000000000000000000");
 
@@ -134,10 +133,10 @@ const stakerProperties = {
 }
 
 // f[x_] = Min[x, 1000] + 4 * Sqrt[Max[x - 1000, 0]]
-export function normalizeStake(wei: bigint): bigint {
+export function normalizeStake(wei: bigint, dampening_point: bigint): bigint {
     wei = wei / WEI;
-    const base = wei > ONE_THOUSAND ? ONE_THOUSAND : wei;
-    const extra = wei > ONE_THOUSAND ? wei - ONE_THOUSAND : ZERO;
+    const base = wei > dampening_point ? dampening_point : wei;
+    const extra = wei > dampening_point ? wei - dampening_point : ZERO;
     return (base + (FOUR * isqrt(extra))) * WEI;
 }
 

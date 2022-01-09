@@ -1,6 +1,9 @@
 import { normalizeStake, getMultiplierForPercentile, applyMultiplier, stakerSEV, stakersSEV, getCumulativeNormalizedStake, networkSEV, getTotalCumulativeNormalizedStake, Network } from "./";
 import { range } from "./constants";
 
+const ZERO = BigInt(0);
+const ONE_THOUSAND = BigInt(1000);
+
 async function rewardCalcuation(startBlock: number, endBlock: number, network: Network) {
     const numBlocks = endBlock - startBlock + 1;
     const stakersPromise = Promise.all(range(numBlocks)
@@ -14,24 +17,24 @@ async function rewardCalcuation(startBlock: number, endBlock: number, network: N
         throw new Error("Start on block with stake event");
 
     let totalCumulativeNormalized = networks[0].totalCumulativeNormalizedStaked;
-    let accumulatedNormalized = BigInt(0);
+    let accumulatedNormalized = ZERO;
 
     for (let i = 0; i < numBlocks ; ++i) {
 
         if (networks[i].totalCumulativeNormalizedStakedLastBlock === startBlock + i) {
             totalCumulativeNormalized = totalCumulativeNormalized + accumulatedNormalized;
             expect(networks[i].totalCumulativeNormalizedStaked).toEqual(totalCumulativeNormalized);
-            accumulatedNormalized = BigInt(0);
+            accumulatedNormalized = ZERO;
         }
         
         const {total, totalNormalized} = stakers[i].reduce((prev, curr) => {
-            const normalized = normalizeStake(curr.staked);
+            const normalized = curr.normalizedStaked;
             accumulatedNormalized += normalized;
             return {
                 total: prev.total + curr.staked,
                 totalNormalized: prev.totalNormalized + normalized
             }
-        }, {total: BigInt(0), totalNormalized: BigInt(0)});
+        }, {total: ZERO, totalNormalized: ZERO});
 
         expect(networks[i].totalStaked).toEqual(total);
         expect(networks[i].totalNormalizedStaked).toEqual(totalNormalized);
@@ -45,15 +48,15 @@ async function rewardCalcuation(startBlock: number, endBlock: number, network: N
 describe("network-sev", () => {
     describe("normalizeStake", () => {
         it("undampened", () => {
-            expect(normalizeStake(BigInt("0"))).toEqual(BigInt("0"));
-            expect(normalizeStake(BigInt("50000000000000000000"))).toEqual(BigInt("50000000000000000000"));
-            expect(normalizeStake(BigInt("100000000000000000000"))).toEqual(BigInt("100000000000000000000"));
-            expect(normalizeStake(BigInt("1000000000000000000000"))).toEqual(BigInt("1000000000000000000000"));
+            expect(normalizeStake(BigInt("0"), ONE_THOUSAND)).toEqual(BigInt("0"));
+            expect(normalizeStake(BigInt("50000000000000000000"), ONE_THOUSAND)).toEqual(BigInt("50000000000000000000"));
+            expect(normalizeStake(BigInt("100000000000000000000"), ONE_THOUSAND)).toEqual(BigInt("100000000000000000000"));
+            expect(normalizeStake(BigInt("1000000000000000000000"), ONE_THOUSAND)).toEqual(BigInt("1000000000000000000000"));
         });
 
         it("dampened", () => {
-            expect(normalizeStake(BigInt("1100000000000000000000"))).toEqual(BigInt("1040000000000000000000"));
-            expect(normalizeStake(BigInt("133700000000000000000000"))).toEqual(BigInt("2456000000000000000000"));
+            expect(normalizeStake(BigInt("1100000000000000000000"), ONE_THOUSAND)).toEqual(BigInt("1040000000000000000000"));
+            expect(normalizeStake(BigInt("133700000000000000000000"), ONE_THOUSAND)).toEqual(BigInt("2456000000000000000000"));
         });
     });
 
@@ -70,7 +73,7 @@ describe("network-sev", () => {
 
         it.skip("table", () => {
             const line = (nominalStake: number) => {
-                const normalizedStake = normalizeStake(BigInt("1000000000000000000") * BigInt(nominalStake));
+                const normalizedStake = normalizeStake(BigInt("1000000000000000000") * BigInt(nominalStake), ONE_THOUSAND);
                 const s = Number((normalizedStake / BigInt("1000000000000000000")).toString());
                 console.log(`${nominalStake}: ${getMultiplierForPercentile(0)*s} ${getMultiplierForPercentile(10)*s} ${getMultiplierForPercentile(20)*s} ${getMultiplierForPercentile(30)*s} ${getMultiplierForPercentile(40)*s} ${getMultiplierForPercentile(50)*s} ${getMultiplierForPercentile(60)*s} ${getMultiplierForPercentile(70)*s} ${getMultiplierForPercentile(80)*s} ${getMultiplierForPercentile(90)*s} ${getMultiplierForPercentile(100)*s}`)
             };
@@ -102,7 +105,7 @@ describe("network-sev", () => {
             expect(start).not.toBeUndefined();
             expect(start.staked).toEqual(BigInt("1337000000000000000000"));
             expect(start.normalizedStaked).toEqual(BigInt("1072000000000000000000"));
-            expect(start.cumulativeNormalizedStaked).toEqual(BigInt(0));
+            expect(start.cumulativeNormalizedStaked).toEqual(ZERO);
             expect(start.cumulativeNormalizedStakedLastBlock).toEqual(11416339);
 
             const end = await stakerSEV({account: "0x6d048c853c4b335396f37f640ea517969ed50d43", block: 11420091, network: "ropsten" });
@@ -131,10 +134,10 @@ describe("network-sev", () => {
             const result = getCumulativeNormalizedStake(first, 11416341, last, 11420340);
 
             // verify the calculation
-            const firstStake = normalizeStake(BigInt("1337000000000000000000"));
+            const firstStake = normalizeStake(BigInt("1337000000000000000000"), ONE_THOUSAND);
             // from block [11416341, 11420089]
             const firstCumulative = firstStake * BigInt(3749);
-            const secondStake = normalizeStake(BigInt("1000000000000000000000"));
+            const secondStake = normalizeStake(BigInt("1000000000000000000000"), ONE_THOUSAND);
             // from block [11420090, 11420340]
             const secondCumulative = secondStake * BigInt(251);
             const cumulative = firstCumulative + secondCumulative;
@@ -157,7 +160,7 @@ describe("network-sev", () => {
             const firstCumulative = firstStake * BigInt(3749);
             const secondStake = BigInt("6458000000000000000000");
             const diff = firstStake - secondStake;
-            expect(diff).toEqual(normalizeStake(BigInt("1337000000000000000000")) - normalizeStake(BigInt("1000000000000000000000")));
+            expect(diff).toEqual(normalizeStake(BigInt("1337000000000000000000"), ONE_THOUSAND) - normalizeStake(BigInt("1000000000000000000000"), ONE_THOUSAND));
             // from block [11420090, 11420340]
             const secondCumulative = secondStake * BigInt(251);
             const cumulative = firstCumulative + secondCumulative;
@@ -182,7 +185,7 @@ describe("network-sev", () => {
                 throw new Error("cumulativeStake pick range with no new stakers");
 
             const total = endStakers.reduce((prev, curr, index) =>
-                prev + getCumulativeNormalizedStake(startStakers[index], 11416345, curr, 11420340), BigInt(0));
+                prev + getCumulativeNormalizedStake(startStakers[index], 11416345, curr, 11420340), ZERO);
 
             expect(total).toEqual(result);
         });

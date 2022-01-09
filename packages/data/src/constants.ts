@@ -14,9 +14,9 @@ const GRAPH_API_ENDPOINTS: { [key in Network]: GraphQLEndpoints} = {
         governance: process.env['GRAPH_MAINNET_GOVERNANCE'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network',
         distribution: process.env['GRAPH_MAINNET_DISTRIBUTION'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network',
         network: process.env['GRAPH_MAINNET_NETWORK'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network',
-        token: process.env['GRAPH_MAINNET_TOKEN'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-sev',
-        networkSEV: process.env['GRAPH_MAINNET_NETWORKSEV'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-sev',
-        distributionSEV: process.env['GRAPH_MAINNET_DISTRIBUTIONSEV'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-sev'
+        token: process.env['GRAPH_MAINNET_TOKEN'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-sev-2',
+        networkSEV: process.env['GRAPH_MAINNET_NETWORKSEV'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-sev-2',
+        distributionSEV: process.env['GRAPH_MAINNET_DISTRIBUTIONSEV'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-sev-2'
     },
     ['ropsten']: {
         governance: process.env['GRAPH_ROPSTEN_GOVERNANCE'] ?? 'https://api.thegraph.com/subgraphs/name/eden-network/eden-network-ropsten',
@@ -85,11 +85,16 @@ const DISTRIBUTORSEV_CONTRACT: { [key in Network]: {address: string, startBlock:
 
 const GRAPH_MAX_ENTITIES_IN_QUERY = 100;
 
+const SEV_FORK_DAMPENING_POINT_BEFORE = BigInt(1000);
+const SEV_FORK_DAMPENING_POINT_AFTER = BigInt(100000);
+const SEV_FORK_MAINNET_BLOCK = 13987000;
+
 const range = n => Array.from({length: n}, (value, key) => key);
 
 export {
     GRAPH_MAX_ENTITIES_IN_QUERY, range,
     GRAPH_API_ENDPOINTS,
     GOVERNANCE_CONTRACT, DISTRIBUTOR_CONTRACT, NETWORK_CONTRACT, TOKEN_CONTRACT, DISTRIBUTORSEV_CONTRACT,
+    SEV_FORK_DAMPENING_POINT_BEFORE, SEV_FORK_DAMPENING_POINT_AFTER, SEV_FORK_MAINNET_BLOCK,
     Network 
 };
