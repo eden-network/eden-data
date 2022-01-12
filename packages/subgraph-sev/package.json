@@ -1,7 +1,7 @@
 {
     "name": "@eden-network/subgraph-sev",
     "license": "MIT",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "author": "Jeffrey Quesnelle <jeff@edennetwork.io>",
     "scripts": {
         "codegen": "graph codegen subgraph.yaml",
