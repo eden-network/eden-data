@@ -14,7 +14,10 @@ import { currentDistribution as currentDistributionSEV, distribution as distribu
     distributions as distributionsSEV, account as accountSEV, accounts as accountsSEV,
     debtTotal
 } from './distribution-sev';
-import { Network, GOVERNANCE_CONTRACT, DISTRIBUTOR_CONTRACT, NETWORK_CONTRACT, TOKEN_CONTRACT, DISTRIBUTORSEV_CONTRACT } from './constants';
+import {
+    Network, GOVERNANCE_CONTRACT, DISTRIBUTOR_CONTRACT, NETWORK_CONTRACT, TOKEN_CONTRACT, DISTRIBUTORSEV_CONTRACT,
+    SEV_FORK_DAMPENING_POINT_BEFORE, SEV_FORK_DAMPENING_POINT_AFTER, SEV_FORK_MAINNET_BLOCK
+ } from './constants';
 
 // https://stackoverflow.com/questions/48011353/how-to-unwrap-type-of-a-promise
 type ThenArgRecursive<T> = T extends PromiseLike<infer U>
@@ -53,5 +56,6 @@ export {
     currentDistributionSEV, distributionSEV, distributionsSEV, accountSEV,
     accountsSEV, debtTotal,
     timeseries,
-    Network, GOVERNANCE_CONTRACT, DISTRIBUTOR_CONTRACT, NETWORK_CONTRACT, TOKEN_CONTRACT, DISTRIBUTORSEV_CONTRACT
+    Network, GOVERNANCE_CONTRACT, DISTRIBUTOR_CONTRACT, NETWORK_CONTRACT, TOKEN_CONTRACT, DISTRIBUTORSEV_CONTRACT,
+    SEV_FORK_DAMPENING_POINT_BEFORE, SEV_FORK_DAMPENING_POINT_AFTER, SEV_FORK_MAINNET_BLOCK
 };
