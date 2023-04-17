@@ -19,7 +19,7 @@
     },
     "devDependencies": {
         "@graphprotocol/graph-cli": "^0.21.1",
-        "@graphprotocol/graph-ts": "^0.20.1",
+        "@graphprotocol/graph-ts": "^0.25.0",
         "cross-var": "^1.1.0",
         "dotenv-cli": "^4.0.0",
         "mustache": "^4.2.0",

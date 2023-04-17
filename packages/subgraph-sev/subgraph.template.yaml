@@ -11,7 +11,7 @@ dataSources:
       startBlock: {{ networkStartBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyScript
       entities:
         - Staker
@@ -34,7 +34,7 @@ dataSources:
       startBlock: {{ distributorSEVStartBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyScript
       entities:
         - Distributor
@@ -66,7 +66,7 @@ dataSources:
       startBlock: {{ tokenStartBlock }}
     mapping:
       kind: ethereum/events
-      apiVersion: 0.0.4
+      apiVersion: 0.0.5
       language: wasm/assemblyScript
       entities:
         - Balance
